@@ -122,19 +122,40 @@
                     <span class="badge gray">Auto Logic Limits</span>
                 </div>
 
-                <div class="input-group">
-                    <label>Max Temperature (°C)</label>
-                    <input type="number" id="set-temp-max" placeholder="30">
+                <h4 class="setting-title soil-text">Soil Moisture (%)</h4>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Min (Start Pump)</label>
+                        <input type="number" id="set-soil-min" placeholder="40">
+                    </div>
+                    <div class="input-group">
+                        <label>Max (Stop Pump)</label>
+                        <input type="number" id="set-soil-max" placeholder="80">
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Start Pump Below (%)</label>
-                    <input type="number" id="set-soil-min" placeholder="43">
+                <h4 class="setting-title hum-text">Air Humidity (%)</h4>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Min (Start Mist)</label>
+                        <input type="number" id="set-hum-min" placeholder="60">
+                    </div>
+                    <div class="input-group">
+                        <label>Max (Stop Mist)</label>
+                        <input type="number" id="set-hum-max" placeholder="80">
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Stop Pump Above (%)</label>
-                    <input type="number" id="set-soil-max" placeholder="80">
+                <h4 class="setting-title temp-text">Temperature (°C)</h4>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Min (Optimal)</label>
+                        <input type="number" id="set-temp-min" placeholder="25">
+                    </div>
+                    <div class="input-group">
+                        <label>Max (Start Fan)</label>
+                        <input type="number" id="set-temp-max" placeholder="30">
+                    </div>
                 </div>
 
                 <button class="save-btn" onclick="saveSettings()">Save Configuration</button>
