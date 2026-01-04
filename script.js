@@ -1,9 +1,9 @@
-// Import Firebase SDK (menggunakan URL CDN agar tidak perlu instalasi Node.js)
+// Import Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// --- 1. FIREBASE CONFIGURATION (DATA ANDA) ---
+// --- 1. FIREBASE CONFIGURATION ---
 const firebaseConfig = {
     apiKey: "AIzaSyC-yv8Kk-auYf4P1sN-RdkQeY372wYcANg",
     authDomain: "growcube-10f1d.firebaseapp.com",
@@ -26,19 +26,17 @@ const dashboard = document.getElementById('dashboard');
 // Cek Status Login
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // User Login -> Tampilkan Dashboard
         loginOverlay.classList.add('hidden');
         dashboard.classList.remove('hidden');
         updateConnectionStatus(true);
-        startListening(); // Mulai baca data
+        startListening();
     } else {
-        // User Logout -> Tampilkan Login
         loginOverlay.classList.remove('hidden');
         dashboard.classList.add('hidden');
     }
 });
 
-// Fungsi Login (Dipanggil tombol HTML)
+// Fungsi Login
 window.login = () => {
     const email = document.getElementById('email-input').value;
     const pass = document.getElementById('pass-input').value;
@@ -60,34 +58,25 @@ window.logout = () => {
 // --- 3. REALTIME DATA LISTENING ---
 function startListening() {
     
-    // A. MONITORING SENSORS (/sensors)
+    // A. MONITORING SENSORS
     const sensorsRef = ref(db, 'sensors');
     onValue(sensorsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            // Update UI
             document.getElementById('val-temp').innerText = data.temperature.toFixed(1) + " °C";
             document.getElementById('val-hum').innerText = data.humidity.toFixed(1) + " %";
             document.getElementById('val-soil').innerText = data.soil_percent + " %";
         }
     });
 
-    // B. MONITORING STATUS STRINGS (from ESP32 actuators feedback)
-    // Sebenarnya ESP32 update status string di variabel internal,
-    // Jika kita ingin tampilkan status teks (OPTIMAL/KERING), kita harus kirim string itu ke Firebase.
-    // Tapi karena JSON ESP32 tadi belum kirim string, kita buat logic visual di JS saja.
-    // (Optional: Bisa ditambahkan nanti di ESP32 json.set("stat_soil", ...))
-
-    // C. CONTROL STATUS (/controls)
+    // B. CONTROL STATUS
     const controlsRef = ref(db, 'controls');
     onValue(controlsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            // Update Toggle Auto/Manual
             const isManual = data.manual_override;
             document.getElementById('manual-override-toggle').checked = isManual;
             
-            // Update UI Mode Text
             const modeText = document.getElementById('mode-text');
             const manualPanel = document.getElementById('manual-panel');
             
@@ -99,8 +88,7 @@ function startListening() {
                 manualPanel.classList.add('disabled');
             }
 
-            // Update Input Values (Sync with DB incase changed elsewhere)
-            // Hanya update jika elemen tidak sedang difokuskan (agar slider tidak loncat saat digeser)
+            // Update Input Values jika tidak sedang fokus
             if(document.activeElement.id !== 'slider-fan') {
                 document.getElementById('slider-fan').value = data.manual_fan;
                 document.getElementById('label-fan').innerText = data.manual_fan;
@@ -114,14 +102,20 @@ function startListening() {
         }
     });
 
-    // D. SETTINGS STATUS (/settings)
+    // C. SETTINGS STATUS (UPDATED for 6 VARIABLES)
     const settingsRef = ref(db, 'settings');
     onValue(settingsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            document.getElementById('set-temp-max').value = data.temp_threshold_max;
+            // Soil
             document.getElementById('set-soil-min').value = data.soil_threshold_min;
             document.getElementById('set-soil-max').value = data.soil_threshold_max;
+            // Humidity
+            document.getElementById('set-hum-min').value = data.hum_threshold_min;
+            document.getElementById('set-hum-max').value = data.hum_threshold_max;
+            // Temperature
+            document.getElementById('set-temp-min').value = data.temp_threshold_min;
+            document.getElementById('set-temp-max').value = data.temp_threshold_max;
         }
     });
 }
@@ -130,40 +124,48 @@ function startListening() {
 
 // Mode Toggle
 document.getElementById('manual-override-toggle').addEventListener('change', (e) => {
-    update(ref(db, 'controls'), {
-        manual_override: e.target.checked
-    });
+    update(ref(db, 'controls'), { manual_override: e.target.checked });
 });
 
-// Slider Helpers (Tampilkan angka saat geser)
+// Slider Helpers
 window.updateLabel = (type, val) => {
     document.getElementById('label-' + type).innerText = val;
 }
 
-// Send PWM Control (Fan/Pump)
+// Send PWM Control
 window.sendControl = (type, val) => {
     const path = 'controls/manual_' + type;
     set(ref(db, path), parseInt(val));
 }
 
-// Send Toggle Control (Mist/Lamp)
+// Send Toggle Control
 window.sendToggle = (type, state) => {
     const path = 'controls/manual_' + type;
     set(ref(db, path), state);
 }
 
-// Save Settings
+// Save Settings (UPDATED)
 window.saveSettings = () => {
-    const tMax = parseFloat(document.getElementById('set-temp-max').value);
+    // Ambil semua 6 nilai dari input
     const sMin = parseFloat(document.getElementById('set-soil-min').value);
     const sMax = parseFloat(document.getElementById('set-soil-max').value);
+    
+    const hMin = parseFloat(document.getElementById('set-hum-min').value);
+    const hMax = parseFloat(document.getElementById('set-hum-max').value);
+    
+    const tMin = parseFloat(document.getElementById('set-temp-min').value);
+    const tMax = parseFloat(document.getElementById('set-temp-max').value);
 
+    // Update ke Firebase
     update(ref(db, 'settings'), {
-        temp_threshold_max: tMax,
         soil_threshold_min: sMin,
-        soil_threshold_max: sMax
+        soil_threshold_max: sMax,
+        hum_threshold_min: hMin,
+        hum_threshold_max: hMax,
+        temp_threshold_min: tMin,
+        temp_threshold_max: tMax
     }).then(() => {
-        alert("Settings Saved to Cloud!");
+        alert("All Thresholds Saved to Cloud!");
     }).catch((error) => {
         alert("Error saving: " + error.message);
     });
