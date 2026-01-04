@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroGreenhouse Controller</title>
+    
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="login-overlay" class="login-container">
+        <div class="login-box">
+            <h2>🌿 GrowCube Access</h2>
+            <p>Please login to access the greenhouse.</p>
+            <input type="email" id="email-input" placeholder="Email" value="mluthfikhafid@gmail.com">
+            <input type="password" id="pass-input" placeholder="Password" value="growcube123">
+            <button onclick="login()">Enter Dashboard</button>
+            <p id="login-error" class="error-text"></p>
+        </div>
+    </div>
+
+    <div id="dashboard" class="container hidden">
+        
+        <header>
+            <div class="header-text">
+                <h1>MicroGreenhouse</h1>
+                <p>AI & IoT Integrated System</p>
+            </div>
+            <button class="logout-btn" onclick="logout()"><i class='bx bx-log-out'></i></button>
+        </header>
+
+        <div class="mode-section">
+            <div class="card mode-card">
+                <div class="mode-info">
+                    <h3>System Mode</h3>
+                    <p id="mode-text">AUTO (AI Fuzzy Logic)</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="manual-override-toggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div id="connection-status" class="status-badge offline">Disconnected</div>
+        </div>
+
+        <div class="grid-container">
+            <div class="card sensor-card">
+                <div class="icon-bg temp"><i class='bx bxs-thermometer'></i></div>
+                <div class="sensor-data">
+                    <h3>Temperature</h3>
+                    <h2 id="val-temp">-- °C</h2>
+                    <p id="stat-temp" class="status-text">Calibrating...</p>
+                </div>
+            </div>
+
+            <div class="card sensor-card">
+                <div class="icon-bg hum"><i class='bx bxs-droplet'></i></div>
+                <div class="sensor-data">
+                    <h3>Air Humidity</h3>
+                    <h2 id="val-hum">-- %</h2>
+                    <p id="stat-hum" class="status-text">Calibrating...</p>
+                </div>
+            </div>
+
+            <div class="card sensor-card">
+                <div class="icon-bg soil"><i class='bx bxs-leaf'></i></div>
+                <div class="sensor-data">
+                    <h3>Soil Moisture</h3>
+                    <h2 id="val-soil">-- %</h2>
+                    <p id="stat-soil" class="status-text">Calibrating...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-split">
+            <div class="card control-panel disabled" id="manual-panel">
+                <div class="card-header">
+                    <h3><i class='bx bx-joystick'></i> Manual Control</h3>
+                    <span class="badge">Only in Manual Mode</span>
+                </div>
+
+                <div class="control-item">
+                    <label>Exhaust Fan (PWM)</label>
+                    <div class="slider-group">
+                        <input type="range" min="0" max="255" value="0" id="slider-fan" oninput="updateLabel('fan', this.value)" onchange="sendControl('fan', this.value)">
+                        <span id="label-fan">0</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>Water Pump (PWM)</label>
+                    <div class="slider-group">
+                        <input type="range" min="0" max="255" value="0" id="slider-pump" oninput="updateLabel('pump', this.value)" onchange="sendControl('pump', this.value)">
+                        <span id="label-pump">0</span>
+                    </div>
+                </div>
+
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <span>Mist Maker</span>
+                        <label class="switch small">
+                            <input type="checkbox" id="toggle-mist" onchange="sendToggle('mist', this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span>Grow Light</span>
+                        <label class="switch small">
+                            <input type="checkbox" id="toggle-lamp" onchange="sendToggle('lamp', this.checked)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card settings-panel">
+                <div class="card-header">
+                    <h3><i class='bx bx-slider-alt'></i> AI Thresholds</h3>
+                    <span class="badge gray">Auto Logic Limits</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Max Temperature (°C)</label>
+                    <input type="number" id="set-temp-max" placeholder="30">
+                </div>
+
+                <div class="input-group">
+                    <label>Start Pump Below (%)</label>
+                    <input type="number" id="set-soil-min" placeholder="43">
+                </div>
+
+                <div class="input-group">
+                    <label>Stop Pump Above (%)</label>
+                    <input type="number" id="set-soil-max" placeholder="80">
+                </div>
+
+                <button class="save-btn" onclick="saveSettings()">Save Configuration</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>MicroGreenhouse IoT Project &copy; 2026</p>
+        </footer>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
