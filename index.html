@@ -52,8 +52,7 @@
                 <div class="sensor-data">
                     <h3>Temperature</h3>
                     <h2 id="val-temp">-- °C</h2>
-                    <p id="stat-temp" class="status-text">Calibrating...</p>
-                </div>
+                    <p id="stat-temp" class="status-text fw-bold">Reading...</p> </div>
             </div>
 
             <div class="card sensor-card">
@@ -61,8 +60,7 @@
                 <div class="sensor-data">
                     <h3>Air Humidity</h3>
                     <h2 id="val-hum">-- %</h2>
-                    <p id="stat-hum" class="status-text">Calibrating...</p>
-                </div>
+                    <p id="stat-hum" class="status-text fw-bold">Reading...</p> </div>
             </div>
 
             <div class="card sensor-card">
@@ -70,8 +68,7 @@
                 <div class="sensor-data">
                     <h3>Soil Moisture</h3>
                     <h2 id="val-soil">-- %</h2>
-                    <p id="stat-soil" class="status-text">Calibrating...</p>
-                </div>
+                    <p id="stat-soil" class="status-text fw-bold">Reading...</p> </div>
             </div>
         </div>
 
@@ -83,7 +80,7 @@
                 </div>
 
                 <div class="control-item">
-                    <label>Exhaust Fan (PWM)</label>
+                    <label>Exhaust Fan (Set PWM)</label>
                     <div class="slider-group">
                         <input type="range" min="0" max="255" value="0" id="slider-fan" oninput="updateLabel('fan', this.value)" onchange="sendControl('fan', this.value)">
                         <span id="label-fan">0</span>
@@ -91,7 +88,7 @@
                 </div>
 
                 <div class="control-item">
-                    <label>Water Pump (PWM)</label>
+                    <label>Water Pump (Set PWM)</label>
                     <div class="slider-group">
                         <input type="range" min="0" max="255" value="0" id="slider-pump" oninput="updateLabel('pump', this.value)" onchange="sendControl('pump', this.value)">
                         <span id="label-pump">0</span>
@@ -157,8 +154,53 @@
                         <input type="number" id="set-temp-max" placeholder="30">
                     </div>
                 </div>
-
                 <button class="save-btn" onclick="saveSettings()">Save Configuration</button>
+            </div>
+        </div>
+
+        <div class="card diagnostic-panel" style="margin-top: 20px;">
+            <div class="card-header">
+                <h3><i class='bx bx-pulse'></i> Real-time Actuator & System Health</h3>
+                <span class="badge blue">Live Monitor</span>
+            </div>
+            
+            <div class="diag-grid">
+                <div class="diag-item">
+                    <h4>Actuator Status</h4>
+                    <table class="status-table">
+                        <tr>
+                            <td><i class='bx bx-wind'></i> Exhaust Fan</td>
+                            <td class="text-right"><span id="mon-fan-pwm" class="val-mono">0</span> <span class="unit">PWM</span></td>
+                            <td><div class="progress-mini"><div id="bar-fan" class="bar-fill" style="width: 0%"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td><i class='bx bx-water'></i> Water Pump</td>
+                            <td class="text-right"><span id="mon-pump-pwm" class="val-mono">0</span> <span class="unit">PWM</span></td>
+                            <td><div class="progress-mini"><div id="bar-pump" class="bar-fill" style="width: 0%"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td><i class='bx bx-cloud-rain'></i> Mist Maker</td>
+                            <td class="text-right" colspan="2"><span id="mon-mist" class="status-badge gray">OFF</span></td>
+                        </tr>
+                        <tr>
+                            <td><i class='bx bx-bulb'></i> Grow Light</td>
+                            <td class="text-right" colspan="2"><span id="mon-lamp" class="status-badge gray">OFF</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="diag-item">
+                    <h4>ESP32 Health</h4>
+                    <div class="health-box">
+                        <div class="heap-info">
+                            <span>Free Heap (RAM)</span>
+                            <span id="mon-heap" class="val-highlight">-- KB</span>
+                        </div>
+                        <div class="heap-bar-container">
+                            <div class="heap-bar" style="width: 100%"></div> </div>
+                        <p class="sys-note">OPI PSRAM Active. System stable.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
