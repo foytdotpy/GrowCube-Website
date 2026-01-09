@@ -4,20 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MicroGreenhouse Controller</title>
-    
     <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div id="login-overlay" class="login-container">
         <div class="login-box">
-            <h2>🌿 GrowCube Access</h2>
-            <p>Please login to access the greenhouse.</p>
-            <input type="email" id="email-input" placeholder="Email" value="mluthfikhafid@gmail.com">
-            <input type="password" id="pass-input" placeholder="Password" value="growcube123">
-            <button onclick="login()">Enter Dashboard</button>
+            <div class="logo-circle"><i class='bx bxs-leaf'></i></div>
+            <h2>GrowCube Access</h2>
+            <p>Secure IoT Dashboard</p>
+            <div class="input-wrap">
+                <i class='bx bx-envelope'></i>
+                <input type="email" id="email-input" placeholder="Email" value="mluthfikhafid@gmail.com">
+            </div>
+            <div class="input-wrap">
+                <i class='bx bx-lock-alt'></i>
+                <input type="password" id="pass-input" placeholder="Password" value="growcube123">
+            </div>
+            <button onclick="login()">Enter Dashboard <i class='bx bx-right-arrow-alt'></i></button>
             <p id="login-error" class="error-text"></p>
         </div>
     </div>
@@ -25,187 +31,229 @@
     <div id="dashboard" class="container hidden">
         
         <header>
-            <div class="header-text">
-                <h1>MicroGreenhouse</h1>
-                <p>AI & IoT Integrated System</p>
+            <div class="brand">
+                <div class="logo-icon"><i class='bx bxs-leaf'></i></div>
+                <div>
+                    <h1>MicroGreenhouse</h1>
+                    <p>AI-Powered Precision Agriculture</p>
+                </div>
             </div>
-            <button class="logout-btn" onclick="logout()"><i class='bx bx-log-out'></i></button>
+            <div class="header-actions">
+                <div id="connection-status" class="status-badge offline">
+                    <i class='bx bxs-circle'></i> Disconnected
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class='bx bx-log-out'></i></button>
+            </div>
         </header>
 
-        <div class="mode-section">
-            <div class="card mode-card">
-                <div class="mode-info">
-                    <h3>System Mode</h3>
-                    <p id="mode-text">AUTO (AI Fuzzy Logic)</p>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="manual-override-toggle">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-            <div id="connection-status" class="status-badge offline">Disconnected</div>
-        </div>
-
         <div class="grid-container">
-            <div class="card sensor-card">
-                <div class="icon-bg temp"><i class='bx bxs-thermometer'></i></div>
-                <div class="sensor-data">
-                    <h3>Temperature</h3>
+            <div class="card sensor-card temp-card">
+                <div class="sensor-icon"><i class='bx bxs-thermometer'></i></div>
+                <div class="sensor-info">
+                    <span class="label">Temperature</span>
                     <h2 id="val-temp">-- °C</h2>
-                    <p id="stat-temp" class="status-text fw-bold">Reading...</p> </div>
+                    <span id="stat-temp" class="fuzzy-badge">Reading...</span>
+                </div>
             </div>
-
-            <div class="card sensor-card">
-                <div class="icon-bg hum"><i class='bx bxs-droplet'></i></div>
-                <div class="sensor-data">
-                    <h3>Air Humidity</h3>
+            <div class="card sensor-card hum-card">
+                <div class="sensor-icon"><i class='bx bxs-droplet'></i></div>
+                <div class="sensor-info">
+                    <span class="label">Humidity</span>
                     <h2 id="val-hum">-- %</h2>
-                    <p id="stat-hum" class="status-text fw-bold">Reading...</p> </div>
+                    <span id="stat-hum" class="fuzzy-badge">Reading...</span>
+                </div>
             </div>
-
-            <div class="card sensor-card">
-                <div class="icon-bg soil"><i class='bx bxs-leaf'></i></div>
-                <div class="sensor-data">
-                    <h3>Soil Moisture</h3>
+            <div class="card sensor-card soil-card">
+                <div class="sensor-icon"><i class='bx bxs-layer'></i></div>
+                <div class="sensor-info">
+                    <span class="label">Soil Moisture</span>
                     <h2 id="val-soil">-- %</h2>
-                    <p id="stat-soil" class="status-text fw-bold">Reading...</p> </div>
+                    <span id="stat-soil" class="fuzzy-badge">Reading...</span>
+                </div>
             </div>
         </div>
 
-        <div class="grid-split">
-            <div class="card control-panel disabled" id="manual-panel">
-                <div class="card-header">
-                    <h3><i class='bx bx-joystick'></i> Manual Control</h3>
-                    <span class="badge">Only in Manual Mode</span>
-                </div>
-
-                <div class="control-item">
-                    <label>Exhaust Fan (Set PWM)</label>
-                    <div class="slider-group">
-                        <input type="range" min="0" max="255" value="0" id="slider-fan" oninput="updateLabel('fan', this.value)" onchange="sendControl('fan', this.value)">
-                        <span id="label-fan">0</span>
-                    </div>
-                </div>
-
-                <div class="control-item">
-                    <label>Water Pump (Set PWM)</label>
-                    <div class="slider-group">
-                        <input type="range" min="0" max="255" value="0" id="slider-pump" oninput="updateLabel('pump', this.value)" onchange="sendControl('pump', this.value)">
-                        <span id="label-pump">0</span>
-                    </div>
-                </div>
-
-                <div class="toggle-group">
-                    <div class="toggle-item">
-                        <span>Mist Maker</span>
-                        <label class="switch small">
-                            <input type="checkbox" id="toggle-mist" onchange="sendToggle('mist', this.checked)">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-item">
-                        <span>Grow Light</span>
-                        <label class="switch small">
-                            <input type="checkbox" id="toggle-lamp" onchange="sendToggle('lamp', this.checked)">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card settings-panel">
-                <div class="card-header">
-                    <h3><i class='bx bx-slider-alt'></i> AI Thresholds</h3>
-                    <span class="badge gray">Auto Logic Limits</span>
-                </div>
-
-                <h4 class="setting-title soil-text">Soil Moisture (%)</h4>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Min (Start Pump)</label>
-                        <input type="number" id="set-soil-min" placeholder="40">
-                    </div>
-                    <div class="input-group">
-                        <label>Max (Stop Pump)</label>
-                        <input type="number" id="set-soil-max" placeholder="80">
-                    </div>
-                </div>
-
-                <h4 class="setting-title hum-text">Air Humidity (%)</h4>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Min (Start Mist)</label>
-                        <input type="number" id="set-hum-min" placeholder="60">
-                    </div>
-                    <div class="input-group">
-                        <label>Max (Stop Mist)</label>
-                        <input type="number" id="set-hum-max" placeholder="80">
-                    </div>
-                </div>
-
-                <h4 class="setting-title temp-text">Temperature (°C)</h4>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Min (Optimal)</label>
-                        <input type="number" id="set-temp-min" placeholder="25">
-                    </div>
-                    <div class="input-group">
-                        <label>Max (Start Fan)</label>
-                        <input type="number" id="set-temp-max" placeholder="30">
-                    </div>
-                </div>
-                <button class="save-btn" onclick="saveSettings()">Save Configuration</button>
-            </div>
-        </div>
-
-        <div class="card diagnostic-panel" style="margin-top: 20px;">
-            <div class="card-header">
-                <h3><i class='bx bx-pulse'></i> Real-time Actuator & System Health</h3>
-                <span class="badge blue">Live Monitor</span>
-            </div>
+        <div class="main-grid">
             
-            <div class="diag-grid">
-                <div class="diag-item">
-                    <h4>Actuator Status</h4>
-                    <table class="status-table">
-                        <tr>
-                            <td><i class='bx bx-wind'></i> Exhaust Fan</td>
-                            <td class="text-right"><span id="mon-fan-pwm" class="val-mono">0</span> <span class="unit">PWM</span></td>
-                            <td><div class="progress-mini"><div id="bar-fan" class="bar-fill" style="width: 0%"></div></div></td>
-                        </tr>
-                        <tr>
-                            <td><i class='bx bx-water'></i> Water Pump</td>
-                            <td class="text-right"><span id="mon-pump-pwm" class="val-mono">0</span> <span class="unit">PWM</span></td>
-                            <td><div class="progress-mini"><div id="bar-pump" class="bar-fill" style="width: 0%"></div></div></td>
-                        </tr>
-                        <tr>
-                            <td><i class='bx bx-cloud-rain'></i> Mist Maker</td>
-                            <td class="text-right" colspan="2"><span id="mon-mist" class="status-badge gray">OFF</span></td>
-                        </tr>
-                        <tr>
-                            <td><i class='bx bx-bulb'></i> Grow Light</td>
-                            <td class="text-right" colspan="2"><span id="mon-lamp" class="status-badge gray">OFF</span></td>
-                        </tr>
-                    </table>
+            <div class="col-left">
+                <div class="card mode-card">
+                    <div class="mode-text">
+                        <h3 id="mode-title">AUTO MODE</h3>
+                        <p>AI Fuzzy Logic is controlling the environment.</p>
+                    </div>
+                    <label class="switch big-switch">
+                        <input type="checkbox" id="manual-override-toggle">
+                        <span class="slider round"></span>
+                    </label>
                 </div>
 
-                <div class="diag-item">
-                    <h4>ESP32 Health</h4>
-                    <div class="health-box">
-                        <div class="heap-info">
-                            <span>Free Heap (RAM)</span>
-                            <span id="mon-heap" class="val-highlight">-- KB</span>
+                <div class="card control-panel disabled" id="manual-panel">
+                    <div class="card-header">
+                        <h3><i class='bx bx-joystick'></i> Manual Controls</h3>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="slider-box">
+                            <label><i class='bx bx-wind'></i> Exhaust Fan</label>
+                            <input type="range" min="0" max="255" value="0" id="slider-fan" oninput="updateLabel('fan', this.value)" onchange="sendControl('fan', this.value)">
+                            <span class="val-tag" id="label-fan">0</span>
                         </div>
-                        <div class="heap-bar-container">
-                            <div class="heap-bar" style="width: 100%"></div> </div>
-                        <p class="sys-note">OPI PSRAM Active. System stable.</p>
+                        <div class="slider-box">
+                            <label><i class='bx bx-water'></i> Water Pump</label>
+                            <input type="range" min="0" max="255" value="0" id="slider-pump" oninput="updateLabel('pump', this.value)" onchange="sendControl('pump', this.value)">
+                            <span class="val-tag" id="label-pump">0</span>
+                        </div>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-box">
+                            <label><i class='bx bx-cloud-rain'></i> Mist</label>
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-mist" onchange="sendToggle('mist', this.checked)">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-box">
+                            <label><i class='bx bx-bulb'></i> Light</label>
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-lamp" onchange="sendToggle('lamp', this.checked)">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
+
+                <div class="card settings-panel">
+                    <div class="card-header">
+                        <h3><i class='bx bx-slider-alt'></i> AI Thresholds</h3>
+                    </div>
+                    <div class="settings-grid">
+                        <div class="set-group">
+                            <label class="soil">Soil Limits (%)</label>
+                            <div class="inputs">
+                                <input type="number" id="set-soil-min" placeholder="Min">
+                                <span>-</span>
+                                <input type="number" id="set-soil-max" placeholder="Max">
+                            </div>
+                        </div>
+                        <div class="set-group">
+                            <label class="temp">Temp Limits (°C)</label>
+                            <div class="inputs">
+                                <input type="number" id="set-temp-min" placeholder="Min">
+                                <span>-</span>
+                                <input type="number" id="set-temp-max" placeholder="Max">
+                            </div>
+                        </div>
+                        <div class="set-group">
+                            <label class="hum">Hum Limits (%)</label>
+                            <div class="inputs">
+                                <input type="number" id="set-hum-min" placeholder="Min">
+                                <span>-</span>
+                                <input type="number" id="set-hum-max" placeholder="Max">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="save-btn" onclick="saveSettings()">Update Parameters</button>
+                </div>
+            </div>
+
+            <div class="col-right">
+                
+                <div class="card diag-card">
+                    <div class="card-header">
+                        <h3><i class='bx bx-chip'></i> Actuator Status</h3>
+                    </div>
+                    <div class="actuator-list">
+                        <div class="act-item">
+                            <div class="act-icon"><i class='bx bx-wind'></i></div>
+                            <div class="act-details">
+                                <span>Exhaust Fan</span>
+                                <div class="pwm-bar-wrap">
+                                    <div id="bar-fan" class="pwm-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <span id="mon-fan-pwm" class="act-val">0 PWM</span>
+                        </div>
+                        <div class="act-item">
+                            <div class="act-icon"><i class='bx bx-water'></i></div>
+                            <div class="act-details">
+                                <span>Water Pump</span>
+                                <div class="pwm-bar-wrap">
+                                    <div id="bar-pump" class="pwm-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <span id="mon-pump-pwm" class="act-val">0 PWM</span>
+                        </div>
+                        <div class="act-item small">
+                            <span>Mist Maker</span>
+                            <span id="mon-mist" class="badge gray">OFF</span>
+                        </div>
+                        <div class="act-item small">
+                            <span>Grow Light</span>
+                            <span id="mon-lamp" class="badge gray">OFF</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card diag-card">
+                    <div class="card-header">
+                        <h3><i class='bx bx-pulse'></i> RTOS Task Memory</h3>
+                        <span class="badge blue">Live Bytes</span>
+                    </div>
+                    
+                    <div class="heap-total">
+                        <span>Total Free Heap</span>
+                        <h4 id="val-heap">-- KB</h4>
+                    </div>
+
+                    <div class="task-monitor-list">
+                        <div class="task-item">
+                            <div class="task-head">
+                                <span>Task Sensors</span>
+                                <span id="txt-mem-sensor" class="byte-val">... / ... bytes</span>
+                            </div>
+                            <div class="mem-progress">
+                                <div id="bar-mem-sensor" class="mem-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="task-item">
+                            <div class="task-head">
+                                <span>Task Fuzzy Control</span>
+                                <span id="txt-mem-ctrl" class="byte-val">... / ... bytes</span>
+                            </div>
+                            <div class="mem-progress">
+                                <div id="bar-mem-ctrl" class="mem-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="task-item">
+                            <div class="task-head">
+                                <span>Task Monitor</span>
+                                <span id="txt-mem-monitor" class="byte-val">... / ... bytes</span>
+                            </div>
+                            <div class="mem-progress">
+                                <div id="bar-mem-monitor" class="mem-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="task-item">
+                            <div class="task-head">
+                                <span>Task IoT (SSL)</span>
+                                <span id="txt-mem-iot" class="byte-val">... / ... bytes</span>
+                            </div>
+                            <div class="mem-progress">
+                                <div id="bar-mem-iot" class="mem-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <footer>
-            <p>MicroGreenhouse IoT Project &copy; 2026</p>
+            <p>MicroGreenhouse Project v2.0 &copy; 2026</p>
         </footer>
     </div>
 
