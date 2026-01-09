@@ -1,17 +1,19 @@
 :root {
-    --primary: #10b981; /* Emerald Green */
+    --primary: #10b981;
     --primary-dark: #059669;
     --bg: #f0fdf4;
     --card-bg: #ffffff;
     --text-dark: #1f2937;
     --text-light: #6b7280;
     --danger: #ef4444;
+    --blue: #3b82f6;
+    --orange: #f59e0b;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-body { background-color: var(--bg); color: var(--text-dark); height: 100vh; display: flex; flex-direction: column; }
+body { background-color: var(--bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
 
 /* Login Overlay */
 .login-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -28,69 +30,87 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 .logout-btn { background: #fee2e2; color: var(--danger); border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; }
 
 /* Cards Common Style */
-.card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); transition: transform 0.2s; }
+.card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 20px; }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .badge { font-size: 0.75rem; background: #e5e7eb; padding: 4px 8px; border-radius: 20px; color: var(--text-light); }
+.badge.blue { background: #dbeafe; color: var(--blue); }
 
-/* Mode Section (Top Switch) */
+/* Mode Section */
 .mode-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.mode-card { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 400px; background: var(--primary-dark); color: white; }
+.mode-card { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 400px; background: var(--primary-dark); color: white; margin-bottom: 0; }
 .status-badge { padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; }
 .status-badge.online { background: #d1fae5; color: var(--primary-dark); }
 .status-badge.offline { background: #fee2e2; color: var(--danger); }
+.status-badge.active { background: #d1fae5; color: var(--primary-dark); }
+.status-badge.gray { background: #e5e7eb; color: var(--text-light); }
 
-/* Monitoring Grid (3 Cards) */
+/* Monitoring Grid */
 .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
 .sensor-card { display: flex; align-items: center; gap: 20px; }
 .icon-bg { width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; color: white; }
-.icon-bg.temp { background: #f59e0b; }
-.icon-bg.hum { background: #3b82f6; }
+.icon-bg.temp { background: var(--orange); }
+.icon-bg.hum { background: var(--blue); }
 .icon-bg.soil { background: #8b5cf6; }
 .sensor-data h2 { font-size: 2rem; color: var(--text-dark); }
-.status-text { font-size: 0.85rem; color: var(--text-light); font-weight: 500; }
+.status-text { font-size: 0.85rem; color: var(--text-light); font-weight: 500; margin-top: 5px; }
+.fw-bold { font-weight: 600; color: var(--primary-dark); }
 
-/* Split Section (Manual vs Settings) */
+/* Split Section */
 .grid-split { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
 
-/* Manual Control Panel */
+/* Control Panel */
 .control-item { margin-bottom: 20px; }
 .control-item label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
 .slider-group { display: flex; align-items: center; gap: 15px; }
 input[type=range] { width: 100%; accent-color: var(--primary); }
-
 .toggle-group { display: flex; justify-content: space-between; gap: 20px; }
 .toggle-item { display: flex; align-items: center; justify-content: space-between; background: #f9fafb; padding: 15px; border-radius: 10px; width: 100%; }
+.control-panel.disabled { opacity: 0.6; pointer-events: none; }
 
-/* Disable Effect when Auto Mode */
-.control-panel.disabled { opacity: 0.6; pointer-events: none; position: relative; }
-
-/* === SETTINGS PANEL (NEW UPDATES) === */
+/* Settings Panel */
 .setting-title { font-size: 0.95rem; margin-bottom: 10px; margin-top: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-/* Warna khusus untuk judul setting */
-.setting-title.soil-text { color: #8b5cf6; } /* Ungu sesuai icon soil */
-.setting-title.hum-text { color: #3b82f6; }  /* Biru sesuai icon hum */
-.setting-title.temp-text { color: #f59e0b; } /* Kuning sesuai icon temp */
-
-/* Layout Baris untuk Input (Min Max Sejajar) */
+.setting-title.soil-text { color: #8b5cf6; }
+.setting-title.hum-text { color: #3b82f6; }
+.setting-title.temp-text { color: var(--orange); }
 .input-row { display: flex; gap: 15px; }
 .input-group { flex: 1; margin-bottom: 5px; }
-
-.input-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-light); font-weight: 500; }
-.input-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; }
-.input-group input:focus { outline: none; border-color: var(--primary); }
-
+.input-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-light); }
+.input-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
 .save-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: background 0.3s; }
 .save-btn:hover { background: var(--primary-dark); }
 
-/* Switch Toggle CSS */
+/* Switch Toggle */
 .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
 .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: #fff; } 
 input:checked + .slider:before { transform: translateX(24px); }
-/* Custom colors for small switches inside white cards */
 .switch.small input:checked + .slider { background-color: var(--primary); }
+
+/* NEW: Diagnostic Panel CSS */
+.diag-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+.diag-item h4 { margin-bottom: 15px; color: var(--text-light); font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+
+/* Status Table */
+.status-table { width: 100%; border-collapse: collapse; }
+.status-table td { padding: 10px 5px; border-bottom: 1px solid #f3f4f6; font-size: 0.9rem; vertical-align: middle; }
+.status-table i { font-size: 1.2rem; margin-right: 8px; color: var(--text-light); vertical-align: middle; }
+.text-right { text-align: right; }
+.val-mono { font-family: 'Courier New', monospace; font-weight: 700; color: var(--text-dark); }
+.unit { font-size: 0.75rem; color: var(--text-light); }
+
+/* Mini Progress Bar for PWM */
+.progress-mini { width: 60px; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-left: 10px; display: inline-block; vertical-align: middle; }
+.bar-fill { height: 100%; background: var(--primary); transition: width 0.3s; }
+
+/* Heap Health Box */
+.health-box { background: #f9fafb; padding: 15px; border-radius: 10px; }
+.heap-info { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 600; }
+.val-highlight { color: var(--blue); }
+.heap-bar-container { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.heap-bar { height: 100%; background: var(--blue); }
+.sys-note { font-size: 0.75rem; color: var(--text-light); font-style: italic; }
 
 footer { text-align: center; padding: 20px; color: var(--text-light); font-size: 0.8rem; margin-top: auto; }
 
@@ -99,6 +119,5 @@ footer { text-align: center; padding: 20px; color: var(--text-light); font-size:
     .mode-section { flex-direction: column; gap: 10px; align-items: flex-start; }
     .mode-card { width: 100%; max-width: none; }
     .header-text h1 { font-size: 1.5rem; }
-    /* Pada HP, input min max jadi atas bawah biar tidak sempit */
     .input-row { flex-direction: column; gap: 10px; }
 }
