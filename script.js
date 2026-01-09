@@ -58,18 +58,44 @@ window.logout = () => {
 // --- 3. REALTIME DATA LISTENING ---
 function startListening() {
     
-    // A. MONITORING SENSORS
+    // A. MONITORING SENSORS (Includes Fuzzy Status Strings)
     const sensorsRef = ref(db, 'sensors');
     onValue(sensorsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
+            // Values
             document.getElementById('val-temp').innerText = data.temperature.toFixed(1) + " °C";
             document.getElementById('val-hum').innerText = data.humidity.toFixed(1) + " %";
             document.getElementById('val-soil').innerText = data.soil_percent + " %";
+
+            // Status Strings (Fuzzy Conclusions) - NEW
+            if(data.status_temp) document.getElementById('stat-temp').innerText = data.status_temp;
+            if(data.status_hum) document.getElementById('stat-hum').innerText = data.status_hum;
+            if(data.status_soil) document.getElementById('stat-soil').innerText = data.status_soil;
         }
     });
 
-    // B. CONTROL STATUS
+    // B. MONITORING ACTUATORS (PWM Values + Heap) - NEW
+    const actuatorsRef = ref(db, 'actuators');
+    onValue(actuatorsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // Update PWM Display Table
+            updateMonitor('fan', data.fan_pwm);
+            updateMonitor('pump', data.pump_pwm);
+            
+            // Update Toggle Display Table
+            updateBadge('mist', data.mist_status);
+            updateBadge('lamp', data.lamp_status);
+
+            // Update Heap Status
+            if (data.system_heap_kb) {
+                document.getElementById('mon-heap').innerText = data.system_heap_kb.toFixed(2) + " KB";
+            }
+        }
+    });
+
+    // C. CONTROL STATUS (Mode & Manual Inputs)
     const controlsRef = ref(db, 'controls');
     onValue(controlsRef, (snapshot) => {
         const data = snapshot.val();
@@ -88,7 +114,7 @@ function startListening() {
                 manualPanel.classList.add('disabled');
             }
 
-            // Update Input Values jika tidak sedang fokus
+            // Sync Slider Input visual (only if not focused)
             if(document.activeElement.id !== 'slider-fan') {
                 document.getElementById('slider-fan').value = data.manual_fan;
                 document.getElementById('label-fan').innerText = data.manual_fan;
@@ -102,18 +128,15 @@ function startListening() {
         }
     });
 
-    // C. SETTINGS STATUS (UPDATED for 6 VARIABLES)
+    // D. SETTINGS STATUS
     const settingsRef = ref(db, 'settings');
     onValue(settingsRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            // Soil
             document.getElementById('set-soil-min').value = data.soil_threshold_min;
             document.getElementById('set-soil-max').value = data.soil_threshold_max;
-            // Humidity
             document.getElementById('set-hum-min').value = data.hum_threshold_min;
             document.getElementById('set-hum-max').value = data.hum_threshold_max;
-            // Temperature
             document.getElementById('set-temp-min').value = data.temp_threshold_min;
             document.getElementById('set-temp-max').value = data.temp_threshold_max;
         }
@@ -127,9 +150,39 @@ document.getElementById('manual-override-toggle').addEventListener('change', (e)
     update(ref(db, 'controls'), { manual_override: e.target.checked });
 });
 
-// Slider Helpers
+// Slider Helpers (UI Label Update)
 window.updateLabel = (type, val) => {
     document.getElementById('label-' + type).innerText = val;
+}
+
+// Helper to Update Monitor Table (PWM)
+function updateMonitor(type, val) {
+    // Update Text Value
+    const elText = document.getElementById('mon-' + type + '-pwm');
+    if(elText) elText.innerText = val;
+
+    // Update Progress Bar Width
+    const elBar = document.getElementById('bar-' + type);
+    if(elBar) {
+        const pct = Math.round((val / 255) * 100);
+        elBar.style.width = pct + "%";
+    }
+}
+
+// Helper to Update Monitor Badge (On/Off)
+function updateBadge(type, state) {
+    const el = document.getElementById('mon-' + type);
+    if(el) {
+        if(state) {
+            el.innerText = "ACTIVE";
+            el.classList.remove('gray');
+            el.classList.add('active');
+        } else {
+            el.innerText = "STANDBY";
+            el.classList.remove('active');
+            el.classList.add('gray');
+        }
+    }
 }
 
 // Send PWM Control
@@ -144,19 +197,15 @@ window.sendToggle = (type, state) => {
     set(ref(db, path), state);
 }
 
-// Save Settings (UPDATED)
+// Save Settings
 window.saveSettings = () => {
-    // Ambil semua 6 nilai dari input
     const sMin = parseFloat(document.getElementById('set-soil-min').value);
     const sMax = parseFloat(document.getElementById('set-soil-max').value);
-    
     const hMin = parseFloat(document.getElementById('set-hum-min').value);
     const hMax = parseFloat(document.getElementById('set-hum-max').value);
-    
     const tMin = parseFloat(document.getElementById('set-temp-min').value);
     const tMax = parseFloat(document.getElementById('set-temp-max').value);
 
-    // Update ke Firebase
     update(ref(db, 'settings'), {
         soil_threshold_min: sMin,
         soil_threshold_max: sMax,
